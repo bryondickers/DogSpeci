@@ -1,0 +1,20 @@
+
+<%- include("partials/header");-%>
+
+
+<form action="/compose" method="post" enctype="multipart/form-data" class="formData">
+    <div class="form-group p-5">
+        <label>Dog name:</label>
+        <input type="text"name="titleText" class="form-control">
+        <label>upload dog image</label>
+        <br>
+        <input type="file" name="filename" class="form-control" >
+        <label>Describe you dog</label>
+        <textarea class="form-control" name="postContent"  cols="50" rows="6"></textarea>
+        <br>
+        <button type="submit" class="btn btn-primary btn-lg formBtn">Post</button>
+    </div>
+    
+</form>
+
+<%- include("partials/footer");-%>
