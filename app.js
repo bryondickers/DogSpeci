@@ -9,11 +9,9 @@ const {GridFsStorage} = require("multer-gridfs-storage");
 const mongoose = require("mongoose");
 const fs = require('fs')
 const path = require("path");
-
+const nodeMailer = require("nodemailer");
 
 const SpeciesIntro = " There is enormous variety in the way a dog acts and reacts to the world around them. Those differences can be due to how much socialization and handling they received as a youngster, how well the owner trained them after taking them home, and of course the genetic luck of the draw. In the end, your dog's preferences and personality are as individual as you are and if you can accept that, you're bound to enjoy each other's companionship for life.";
-const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Non diam phasellus vestibulum lorem sed. Platea dictumst quisque sagittis purus sit. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. Mauris in aliquam sem fringilla. Semper risus in hendrerit gravida rutrum quisque non tellus orci. Amet massa vitae tortor condimentum lacinia quis vel eros. Enim ut tellus elementum sagittis vitae. Mauris ultrices eros in cursus turpis massa tincidunt dui.";
-const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
 
 const app = express();
 
@@ -30,11 +28,18 @@ mongoose.connect(process.env.DB_URL);
 
 //define a schema of img
 const postSchema = new mongoose.Schema({
-    postTitle: String,
+    postTitle:{
+        type: String,
+        required: true
+    },
     img:{
         data: Buffer,
-        contentType: String},
-    postBody:String 
+        contentType: String
+    },
+    postBody:{
+        type: String,
+        required: true
+    } 
 })
 const postModel = mongoose.model("Post",postSchema);
 
@@ -63,11 +68,11 @@ app.get("/species",function (req,res) {
 })
 
 app.get("/about",function (req,res) {
-    res.render("about",{aboutParagraph:aboutContent});
+    res.render("about");
 });
 
 app.get("/contact",function (req,res) {
-    res.render("contact",{contactParagaph : contactContent});
+    res.render("contact");
 });
 
 app.get("/compose",function (req,res) {
@@ -159,16 +164,40 @@ app.post("/compose",upload.single("filename"),function (req,res) {
 
 
 
+app.post("/contact",function (req,res) {
 
+    var options =`<h1> SUBJECT: ${req.body.subject}</h1>
+        <ul>
+            <li>NAME: ${req.body.fname}</li>
+            <li>EMAIL: ${req.body.email}</li>
+        </ul>
+        MESSAGE : <br> ${req.body.message}`;
+    
+const transporter = nodeMailer.createTransport({
+    service: "hotmail",
+       auth:{
+        user:process.env.FROM_MAIL,
+        pass:process.env.PASSWORD
+    },
+   
+   
+})
+const mailOptions = {
+    from:process.env.FROM_MAIL,
+    to:process.env.TO_MAIL,
+    subject:"Email from client",
+    html:options
+};
+transporter.sendMail(mailOptions,function (err,info) { 
+    if (err) {
+        console.log(err);
+    } else {
+        console.log("email sent successful" + info.response);
+    }
+ })
+ res.redirect("/contact");
 
-
-
-
-
-
-
-
-
+ })
 
 
 

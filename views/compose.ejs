@@ -2,7 +2,7 @@
 <%- include("partials/header");-%>
 
 
-<form action="/compose" method="post" enctype="multipart/form-data" class="formData">
+<form action="/compose" method="post" name="composeForm" enctype="multipart/form-data" class="formData" onsubmit="return validateForm()">
     <div class="form-group p-5">
         <label>Dog name:</label>
         <input type="text"name="titleText" class="form-control">
@@ -16,5 +16,22 @@
     </div>
     
 </form>
+
+<script>
+    function validateForm() {
+      if (document.forms["composeForm"]["titleText"].value === ""||document.forms["composeForm"]["filename"].value === ""||
+         document.forms["composeForm"]["postContent"].value === "") {
+        alert("fill all fields in compose section "); 
+        return false;
+      }else{
+        alert("successfully composed");
+      }
+     
+    }
+
+  
+      
+</script>
+
 
 <%- include("partials/footer");-%>
